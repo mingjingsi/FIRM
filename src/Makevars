@@ -1,9 +1,10 @@
 PKG_LIBS = $(shell $(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()" )
-PKG_LIBS =$(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) -lgslcblas -lpthread
+#PKG_LIBS =$(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) -lgslcblas -lpthread
+PKG_LIBS =$(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) -lpthread
 ##PKG_CXXFLAGS=-I../inst/include -DARMA_64BIT_WORD
 CXX_STD = CXX11
 
-PKG_IMPORT = RANN2
-PKG_HOME = `${R_HOME}/bin/Rscript -e 'cat(system.file(package="$(PKG_IMPORT)"))'`
-PKG_LIBS += -L$(PKG_HOME)/lib -l$(PKG_IMPORT)
+#PKG_IMPORT = RANN2
+#PKG_HOME = `${R_HOME}/bin/Rscript -e 'cat(system.file(package="$(PKG_IMPORT)"))'`
+#PKG_LIBS += -L$(PKG_HOME)/lib -l$(PKG_IMPORT)
 

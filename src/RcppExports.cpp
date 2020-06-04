@@ -7,34 +7,31 @@
 using namespace Rcpp;
 
 // FIRM_res
-RcppExport SEXP FIRM_res(arma::mat& SS2, arma::uvec& hvg_ind_SS2, arma::mat& SS2_FindClusters, arma::mat& tenx, arma::uvec& hvg_ind_tenx, arma::mat& tenx_FindClusters, const int dims, const int gene_all_num, arma::uvec gene_all_hvg_ind, arma::uvec gene_all_ind_SS2, arma::uvec gene_all_ind_tenx, arma::uvec dataset_list, double quantile_default, const int rept_ds, const int k, const int max_k);
-RcppExport SEXP _FIRM_FIRM_res(SEXP SS2SEXP, SEXP hvg_ind_SS2SEXP, SEXP SS2_FindClustersSEXP, SEXP tenxSEXP, SEXP hvg_ind_tenxSEXP, SEXP tenx_FindClustersSEXP, SEXP dimsSEXP, SEXP gene_all_numSEXP, SEXP gene_all_hvg_indSEXP, SEXP gene_all_ind_SS2SEXP, SEXP gene_all_ind_tenxSEXP, SEXP dataset_listSEXP, SEXP quantile_defaultSEXP, SEXP rept_dsSEXP, SEXP kSEXP, SEXP max_kSEXP) {
+RcppExport SEXP FIRM_res(arma::mat& SS2, arma::uvec& hvg_ind_SS2, arma::vec& SS2_FindClusters, arma::mat& tenx, arma::uvec& hvg_ind_tenx, arma::vec& tenx_FindClusters, const int dims, const int gene_all_num, arma::uvec gene_all_hvg_ind, arma::uvec gene_all_ind_SS2, arma::uvec gene_all_ind_tenx, double quantile_default, const int rept_ds);
+RcppExport SEXP _FIRM_FIRM_res(SEXP SS2SEXP, SEXP hvg_ind_SS2SEXP, SEXP SS2_FindClustersSEXP, SEXP tenxSEXP, SEXP hvg_ind_tenxSEXP, SEXP tenx_FindClustersSEXP, SEXP dimsSEXP, SEXP gene_all_numSEXP, SEXP gene_all_hvg_indSEXP, SEXP gene_all_ind_SS2SEXP, SEXP gene_all_ind_tenxSEXP, SEXP quantile_defaultSEXP, SEXP rept_dsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::mat& >::type SS2(SS2SEXP);
     Rcpp::traits::input_parameter< arma::uvec& >::type hvg_ind_SS2(hvg_ind_SS2SEXP);
-    Rcpp::traits::input_parameter< arma::mat& >::type SS2_FindClusters(SS2_FindClustersSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type SS2_FindClusters(SS2_FindClustersSEXP);
     Rcpp::traits::input_parameter< arma::mat& >::type tenx(tenxSEXP);
     Rcpp::traits::input_parameter< arma::uvec& >::type hvg_ind_tenx(hvg_ind_tenxSEXP);
-    Rcpp::traits::input_parameter< arma::mat& >::type tenx_FindClusters(tenx_FindClustersSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type tenx_FindClusters(tenx_FindClustersSEXP);
     Rcpp::traits::input_parameter< const int >::type dims(dimsSEXP);
     Rcpp::traits::input_parameter< const int >::type gene_all_num(gene_all_numSEXP);
     Rcpp::traits::input_parameter< arma::uvec >::type gene_all_hvg_ind(gene_all_hvg_indSEXP);
     Rcpp::traits::input_parameter< arma::uvec >::type gene_all_ind_SS2(gene_all_ind_SS2SEXP);
     Rcpp::traits::input_parameter< arma::uvec >::type gene_all_ind_tenx(gene_all_ind_tenxSEXP);
-    Rcpp::traits::input_parameter< arma::uvec >::type dataset_list(dataset_listSEXP);
     Rcpp::traits::input_parameter< double >::type quantile_default(quantile_defaultSEXP);
     Rcpp::traits::input_parameter< const int >::type rept_ds(rept_dsSEXP);
-    Rcpp::traits::input_parameter< const int >::type k(kSEXP);
-    Rcpp::traits::input_parameter< const int >::type max_k(max_kSEXP);
-    rcpp_result_gen = Rcpp::wrap(FIRM_res(SS2, hvg_ind_SS2, SS2_FindClusters, tenx, hvg_ind_tenx, tenx_FindClusters, dims, gene_all_num, gene_all_hvg_ind, gene_all_ind_SS2, gene_all_ind_tenx, dataset_list, quantile_default, rept_ds, k, max_k));
+    rcpp_result_gen = Rcpp::wrap(FIRM_res(SS2, hvg_ind_SS2, SS2_FindClusters, tenx, hvg_ind_tenx, tenx_FindClusters, dims, gene_all_num, gene_all_hvg_ind, gene_all_ind_SS2, gene_all_ind_tenx, quantile_default, rept_ds));
     return rcpp_result_gen;
 END_RCPP
 }
 // FIRM_res_all
-RcppExport SEXP FIRM_res_all(arma::mat& SS2, arma::uvec& hvg_ind_SS2, arma::mat& SS2_FindClusters, arma::mat& tenx, arma::uvec& hvg_ind_tenx, arma::mat& tenx_FindClusters, const int dims, const int gene_all_num, arma::uvec gene_all_hvg_ind, arma::uvec gene_all_ind_SS2, arma::uvec gene_all_ind_tenx, arma::uvec dataset_list, double quantile_default, const int rept_ds, const int k, const int max_k, const int coreNum);
-RcppExport SEXP _FIRM_FIRM_res_all(SEXP SS2SEXP, SEXP hvg_ind_SS2SEXP, SEXP SS2_FindClustersSEXP, SEXP tenxSEXP, SEXP hvg_ind_tenxSEXP, SEXP tenx_FindClustersSEXP, SEXP dimsSEXP, SEXP gene_all_numSEXP, SEXP gene_all_hvg_indSEXP, SEXP gene_all_ind_SS2SEXP, SEXP gene_all_ind_tenxSEXP, SEXP dataset_listSEXP, SEXP quantile_defaultSEXP, SEXP rept_dsSEXP, SEXP kSEXP, SEXP max_kSEXP, SEXP coreNumSEXP) {
+RcppExport SEXP FIRM_res_all(arma::mat& SS2, arma::uvec& hvg_ind_SS2, arma::mat& SS2_FindClusters, arma::mat& tenx, arma::uvec& hvg_ind_tenx, arma::mat& tenx_FindClusters, const int dims, const int gene_all_num, arma::uvec gene_all_hvg_ind, arma::uvec gene_all_ind_SS2, arma::uvec gene_all_ind_tenx, double quantile_default, const int rept_ds, const int k, const int max_k, const int coreNum);
+RcppExport SEXP _FIRM_FIRM_res_all(SEXP SS2SEXP, SEXP hvg_ind_SS2SEXP, SEXP SS2_FindClustersSEXP, SEXP tenxSEXP, SEXP hvg_ind_tenxSEXP, SEXP tenx_FindClustersSEXP, SEXP dimsSEXP, SEXP gene_all_numSEXP, SEXP gene_all_hvg_indSEXP, SEXP gene_all_ind_SS2SEXP, SEXP gene_all_ind_tenxSEXP, SEXP quantile_defaultSEXP, SEXP rept_dsSEXP, SEXP kSEXP, SEXP max_kSEXP, SEXP coreNumSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -49,20 +46,19 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::uvec >::type gene_all_hvg_ind(gene_all_hvg_indSEXP);
     Rcpp::traits::input_parameter< arma::uvec >::type gene_all_ind_SS2(gene_all_ind_SS2SEXP);
     Rcpp::traits::input_parameter< arma::uvec >::type gene_all_ind_tenx(gene_all_ind_tenxSEXP);
-    Rcpp::traits::input_parameter< arma::uvec >::type dataset_list(dataset_listSEXP);
     Rcpp::traits::input_parameter< double >::type quantile_default(quantile_defaultSEXP);
     Rcpp::traits::input_parameter< const int >::type rept_ds(rept_dsSEXP);
     Rcpp::traits::input_parameter< const int >::type k(kSEXP);
     Rcpp::traits::input_parameter< const int >::type max_k(max_kSEXP);
     Rcpp::traits::input_parameter< const int >::type coreNum(coreNumSEXP);
-    rcpp_result_gen = Rcpp::wrap(FIRM_res_all(SS2, hvg_ind_SS2, SS2_FindClusters, tenx, hvg_ind_tenx, tenx_FindClusters, dims, gene_all_num, gene_all_hvg_ind, gene_all_ind_SS2, gene_all_ind_tenx, dataset_list, quantile_default, rept_ds, k, max_k, coreNum));
+    rcpp_result_gen = Rcpp::wrap(FIRM_res_all(SS2, hvg_ind_SS2, SS2_FindClusters, tenx, hvg_ind_tenx, tenx_FindClusters, dims, gene_all_num, gene_all_hvg_ind, gene_all_ind_SS2, gene_all_ind_tenx, quantile_default, rept_ds, k, max_k, coreNum));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_FIRM_FIRM_res", (DL_FUNC) &_FIRM_FIRM_res, 16},
-    {"_FIRM_FIRM_res_all", (DL_FUNC) &_FIRM_FIRM_res_all, 17},
+    {"_FIRM_FIRM_res", (DL_FUNC) &_FIRM_FIRM_res, 13},
+    {"_FIRM_FIRM_res_all", (DL_FUNC) &_FIRM_FIRM_res_all, 16},
     {NULL, NULL, 0}
 };
 
