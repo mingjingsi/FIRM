@@ -4,7 +4,7 @@ FIRM is an algorithm for accurate integration of heterogeneous scRNA-seq dataset
 
 # Installation
 
-To install the development version of FIRM, it's easiest to use the 'devtools' package. Note that FIRM depends on the 'Rcpp' package, which also requires appropriate setting of Rtools and Xcode for Windows and Mac OS/X, respectively.
+To install the development version of FIRM, it's easiest to use the 'devtools' package. Note that FIRM depends on the 'Seurat' pacakge, the 'RANN' package and the 'Rcpp' package, which also requires appropriate setting of Rtools and Xcode for Windows and Mac OS/X, respectively.
 
 ```
 #install.packages("devtools")
