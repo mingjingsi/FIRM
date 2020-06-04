@@ -1,5 +1,4 @@
 # FIRM
-===
 
 FIRM is an algorithm for accurate integration of heterogeneous scRNA-seq datasets across multiple platforms, which specifically accounts for the heterogeneity in cell type composition between SS2 and 10X datasets. The integrated datasets generated using FIRM show accurate mixing of shared cell type identities and superior preservation of original structure for each dataset.
 
