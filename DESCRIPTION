@@ -1,12 +1,10 @@
 Package: FIRM
 Type: Package
-Title: What the Package Does (Title Case)
+Title:  FIRM
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: Jingsi Ming
+Maintainer: Jingsi Ming <jsming@ust.hk>
+Description: This package provides functions for integration of single-cell RNA-sequencing data across multiple platforms.
 Encoding: UTF-8
 LazyData: true
 Imports: Rcpp (>= 1.0.4), RcppArmadillo, RANN
