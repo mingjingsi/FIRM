@@ -9,4 +9,3 @@ Encoding: UTF-8
 LazyData: true
 Imports: Rcpp (>= 1.0.4), RcppArmadillo, RANN
 LinkingTo: Rcpp, RcppArmadillo, RANN
-# LinkingTo: Rcpp, RcppArmadillo, RANN2
