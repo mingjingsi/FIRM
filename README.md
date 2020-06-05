@@ -12,6 +12,10 @@ library(devtools)
 install_github("mingjingsi/FIRM")
 ```
 
+# Usage
+
+[The 'FIRM' vignette](https://github.com/mingjingsi/FIRM/blob/master/inst/doc/FIRM_package.pdf?raw=true) will provide a good start point for the analysis using FIRM package.
+
 # Reference
 
 Jingsi Ming, Zhixiang Lin, Xiang Wan, Can Yang, Angela Ruohao Wu, FIRM: Fast Integration of single-cell RNA-sequencing data across Multiple platforms
