@@ -12,14 +12,14 @@ FIRM <- function(SS2, tenx, hvg1, hvg2, dims, res_low_SS2 = 0.1, res_high_SS2 = 
   SS2_embedding <- RunPCA(SS2[hvg, ], npc = dims, verbose = FALSE)@cell.embeddings
   tenx_embedding <- RunPCA(tenx[hvg, ], npc = dims, verbose = FALSE)@cell.embeddings
   gc()
-  
+
   SS2_snn <- FindNeighbors(SS2_embedding, force.recalc = TRUE, verbose = FALSE)$snn
   tenx_snn <- FindNeighbors(tenx_embedding, force.recalc = TRUE, verbose = FALSE)$snn
 
   rm(SS2_embedding)
   rm(tenx_embedding)
   gc()
-  
+
   res_seq_SS2 <- seq(res_low_SS2, res_high_SS2, 0.1)
   res_seq_tenx <- seq(res_low_tenx, res_high_tenx, 0.1)
 
@@ -49,14 +49,14 @@ FIRM <- function(SS2, tenx, hvg1, hvg2, dims, res_low_SS2 = 0.1, res_high_SS2 = 
   # dataset_list <- c(rep(1, ncol(SS2)), rep(2, ncol(tenx)))
 
   if (length(res_SS2) == 0){
-    
+
     integrated_PCA <- matrix(0, length(gene_all), ncol(SS2) + ncol(tenx))
     rownames(integrated_PCA) <- gene_all
     colnames(integrated_PCA) <- c(colnames(SS2), colnames(tenx))
     integrated_PCA[rownames(SS2), 1:ncol(SS2)] <- SS2
     integrated_PCA[rownames(tenx), (ncol(SS2)+1):(ncol(SS2)+ncol(tenx))] <- tenx
     integrated_PCA <- ScaleData(integrated_PCA, do.center = FALSE, verbose = FALSE)
-    
+
     if (verbose == TRUE){
       return(list(integrated = integrated_PCA))
     }
@@ -90,7 +90,7 @@ FIRM <- function(SS2, tenx, hvg1, hvg2, dims, res_low_SS2 = 0.1, res_high_SS2 = 
 
   SS2_FindClusters <- FindClusters(SS2_snn, resolution = res_SS2, verbose = FALSE)
   tenx_FindClusters <- FindClusters(tenx_snn, resolution = res_tenx, verbose = FALSE)
-  
+
   rm(SS2_snn)
   rm(tenx_snn)
   gc()
@@ -175,7 +175,7 @@ FIRM <- function(SS2, tenx, hvg1, hvg2, dims, res_low_SS2 = 0.1, res_high_SS2 = 
     integrated_PCA[rownames(SS2), 1:ncol(SS2)] <- SS2
     integrated_PCA[rownames(tenx), (ncol(SS2)+1):(ncol(SS2)+ncol(tenx))] <- tenx
     integrated_PCA <- ScaleData(integrated_PCA, do.center = FALSE, verbose = FALSE)
-    
+
     if (verbose == TRUE){
       return(list(integrated = integrated_PCA, Metric_PCA = Metric_PCA, Metric_FIRM = Metric_FIRM))
     }
@@ -203,7 +203,7 @@ FIRM <- function(SS2, tenx, hvg1, hvg2, dims, res_low_SS2 = 0.1, res_high_SS2 = 
       integrated_PCA[rownames(SS2), 1:ncol(SS2)] <- SS2
       integrated_PCA[rownames(tenx), (ncol(SS2)+1):(ncol(SS2)+ncol(tenx))] <- tenx
       integrated_PCA <- ScaleData(integrated_PCA, do.center = FALSE, verbose = FALSE)
-      
+
       if (verbose == TRUE){
         return(list(integrated = integrated_PCA, Metric_PCA = Metric_PCA, Metric_FIRM = Metric_FIRM))
       }
@@ -216,7 +216,7 @@ FIRM <- function(SS2, tenx, hvg1, hvg2, dims, res_low_SS2 = 0.1, res_high_SS2 = 
     rownames(integrated_FIRM) <- gene_all
     colnames(integrated_FIRM) <- c(colnames(Dataset1), colnames(Dataset2))
     integrated_FIRM <- ScaleData(integrated_FIRM, do.center = FALSE, verbose = FALSE)
-    
+
     gc()
 
     if (verbose == TRUE){
@@ -228,47 +228,4 @@ FIRM <- function(SS2, tenx, hvg1, hvg2, dims, res_low_SS2 = 0.1, res_high_SS2 = 
   }
 }
 
-
-SelectGene <- function(hvg_list, gene_all = NULL, num = 2000){
-  K <- length(hvg_list)
-
-  hvg_union <- NULL
-  for (k in 1:K){
-    hvg_union <- union(hvg_union, hvg_list[[k]])
-    if (!is.null(gene_all)){
-      hvg_union <- intersect(hvg_union, gene_all)
-    }
-  }
-
-  if (length(hvg_union) < num){
-    return(hvg_union)
-  }
-
-  hvg_union_rank <- matrix(0, length(hvg_union), K)
-  rownames(hvg_union_rank) <- hvg_union
-  for (i in 1:length(hvg_union)){
-    for (k in 1:K){
-      if (hvg_union[i] %in% hvg_list[[k]]) {
-        hvg_union_rank[i, k] <- which(hvg_list[[k]] == hvg_union[i])
-      }
-    }
-  }
-
-  hvg <- hvg_union[which(rowSums(hvg_union_rank != 0) == K)]
-
-  if (length(hvg) >= num){
-    return(hvg)
-  } else{
-    for (k in (K-1):1){
-      hvg_add <- hvg_union[which(rowSums(hvg_union_rank != 0) == k)]
-      if (length(hvg_add) + length(hvg) >= num){
-        hvg_add <- names(sort(apply(hvg_union_rank[hvg_add, ], 1, function(x) median(x[x != 0]))))[1:(num-length(hvg))]
-        hvg <- c(hvg, hvg_add)
-        return(hvg)
-      } else {
-        hvg <- c(hvg, hvg_add)
-      }
-    }
-  }
-}
 
