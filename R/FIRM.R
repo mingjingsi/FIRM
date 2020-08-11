@@ -140,14 +140,70 @@ FIRM <- function(SS2, tenx, hvg1, hvg2, dims, res_low_SS2 = 0.1, res_high_SS2 = 
     res1 <- res_tenx
     res2 <- res_SS2
   }
+  
+  dataset_list <- c(rep(1, ncol(Dataset1)), rep(2, ncol(Dataset2)))
 
+  if (length(res1)*length(res2) == 1){
+    result <- FIRM_res(Dataset1, hvg_ind1, FindClusters1,
+                       Dataset2, hvg_ind2, FindClusters2,
+                       dims, gene_all_num, gene_all_hvg,
+                       gene_all_ind1, gene_all_ind2,
+                       quantile_default = quantile_default, rept = rept)
+    
+    integrated_PCA <- matrix(0, length(gene_all), ncol(SS2) + ncol(tenx))
+    rownames(integrated_PCA) <- gene_all
+    colnames(integrated_PCA) <- c(colnames(SS2), colnames(tenx))
+    integrated_PCA[rownames(SS2), 1:ncol(SS2)] <- SS2
+    integrated_PCA[rownames(tenx), (ncol(SS2)+1):(ncol(SS2)+ncol(tenx))] <- tenx
+    integrated_PCA <- ScaleData(integrated_PCA, do.center = FALSE, verbose = FALSE)
+    integrated_PCA <- RunPCA(integrated_PCA, features = hvg, npcs = dims, verbose = FALSE)
+    Metric_PCA <- mean(Mixing_Metric(integrated_PCA@reductions$pca@cell.embeddings, dataset_list, max.k = max.k))
+    
+    if (all(result$integrated == 0)){
+      print("PCA")
+      
+      if (verbose == TRUE){
+        return(list(integrated = integrated_PCA, Metric_PCA = Metric_PCA))
+      }
+      else{
+        return(integrated_PCA)
+      }
+    }
+
+    integrated_FIRM <- result$integrated
+    rownames(integrated_FIRM) <- gene_all
+    colnames(integrated_FIRM) <- c(colnames(Dataset1), colnames(Dataset2))
+    integrated_FIRM <- ScaleData(integrated_FIRM, do.center = FALSE, verbose = FALSE)
+    integrated_FIRM <- RunPCA(integrated_FIRM, features = hvg, npcs = dims, verbose = FALSE)
+    Metric_FIRM <- mean(Mixing_Metric(integrated_FIRM@reductions$pca@cell.embeddings, dataset_list, max.k = max.k))
+    
+    gc()
+
+    if(min(Metric_FIRM) >= Metric_PCA){
+      print("PCA")
+      
+      if (verbose == TRUE){
+        return(list(integrated = integrated_PCA, Metric_PCA = Metric_PCA, Metric_FIRM = Metric_FIRM))
+      }
+      else{
+        return(integrated_PCA)
+      }
+    } else {
+      if (verbose == TRUE){
+        return(list(integrated = integrated_FIRM, Metric_FIRM = Metric_FIRM, Metric_PCA = Metric_PCA))
+      }
+      else{
+        return(integrated_FIRM)
+      }
+    }
+    
+  }
+  
   result <- FIRM_res_all(Dataset1, hvg_ind1, FindClusters1,
                          Dataset2, hvg_ind2, FindClusters2,
                          dims, gene_all_num, gene_all_hvg,
                          gene_all_ind1, gene_all_ind2,
                          quantile_default = quantile_default, rept = rept, coreNum = coreNum)
-
-  dataset_list <- c(rep(1, ncol(Dataset1)), rep(2, ncol(Dataset2)))
 
   Metric_PCA <- mean(Mixing_Metric(result$Embedding_PCA, dataset_list, max.k = max.k))
 
