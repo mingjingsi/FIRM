@@ -4,7 +4,7 @@
 #PKG_LIBS =$(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) -lgslcblas -lpthread
 PKG_LIBS =$(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) -lpthread
 
-PKG_CPPFLAGS=-I../inst/include
+PKG_CPPFLAGS=-I../inst/include -DARMA_64BIT_WORD=1
 
 ##PKG_CXXFLAGS=-I../inst/include -DARMA_64BIT_WORD
 CXX_STD = CXX11
