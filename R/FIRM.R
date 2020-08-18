@@ -157,7 +157,7 @@ FIRM <- function(SS2, tenx, hvg1, hvg2, dims, res_low_SS2 = 0.1, res_high_SS2 = 
     integrated_PCA[rownames(SS2), 1:ncol(SS2)] <- SS2
     integrated_PCA[rownames(tenx), (ncol(SS2)+1):(ncol(SS2)+ncol(tenx))] <- tenx
     integrated_PCA <- ScaleData(integrated_PCA, do.center = FALSE, verbose = FALSE)
-    integrated_PCA_embedding <- RunPCA(integrated_PCA, features = hvg, npcs = dims, verbose = FALSE)
+    integrated_PCA_embedding <- RunPCA(integrated_PCA[hvg, ], features = hvg, npcs = dims, verbose = FALSE)
     Metric_PCA <- mean(Mixing_Metric(integrated_PCA_embedding@cell.embeddings, dataset_list_PCA, max.k = max.k))
     
     if (all(result$integrated == 0)){
@@ -175,7 +175,7 @@ FIRM <- function(SS2, tenx, hvg1, hvg2, dims, res_low_SS2 = 0.1, res_high_SS2 = 
     rownames(integrated_FIRM) <- gene_all
     colnames(integrated_FIRM) <- c(colnames(Dataset1), colnames(Dataset2))
     integrated_FIRM <- ScaleData(integrated_FIRM, do.center = FALSE, verbose = FALSE)
-    integrated_FIRM_embedding <- RunPCA(integrated_FIRM, features = hvg, npcs = dims, verbose = FALSE)
+    integrated_FIRM_embedding <- RunPCA(integrated_FIRM[hvg, ], features = hvg, npcs = dims, verbose = FALSE)
     Metric_FIRM <- mean(Mixing_Metric(integrated_FIRM_embedding@cell.embeddings, dataset_list, max.k = max.k))
     
     gc()
