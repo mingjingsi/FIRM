@@ -7,5 +7,5 @@ Maintainer: Jingsi Ming <jsming@ust.hk>
 Description: This package provides functions for integration of single-cell RNA-sequencing data across multiple platforms.
 Encoding: UTF-8
 LazyData: true
-Imports: Rcpp (>= 1.0.4), RcppArmadillo, RANN
-LinkingTo: Rcpp, RcppArmadillo, RANN
+Imports: Rcpp (>= 1.0.4), RcppArmadillo, RANN, RcppEigen
+LinkingTo: Rcpp, RcppArmadillo, RANN, RcppEigen
