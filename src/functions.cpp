@@ -1,14 +1,25 @@
 #include "functions.hpp"
+#include <RcppEigen.h>
+
+#include "randompca.h"
 
 mat scale_PCA(mat x, const int dims){
 
   mat x_scaled = x.each_col()/stddev(x, 0, 1).as_col();
-
-  mat U;
-  vec s;
-  mat V;
-  svd(U, s, V, x_scaled.t());
-  mat embedding = U.cols(0, dims-1) * diagmat(s.subvec(0, dims-1));
+    
+  mat xT = x_scaled.t();
+    
+  Eigen::MatrixXd Xm = Eigen::Map<Eigen::MatrixXd>(xT.memptr(), xT.n_rows, xT.n_cols);
+    
+  RandomPCA rpca;
+  rpca.stand_method_x = 0;
+  rpca.divisor = 0;
+  rpca.verbose = FALSE;
+    
+  rpca.pca_fast(Xm, 0, dims, 1e2, 1e-4, 1, FALSE);
+    
+  Rcpp::NumericMatrix P(Rcpp::wrap(rpca.Px));
+  mat embedding = Rcpp::as<arma::mat>(P);
 
   return embedding;
 }
@@ -27,11 +38,19 @@ mat integrated_scale_PCA(mat x, const int dims){
   mat x_scaled = x.each_col()/stddev(x, 0, 1).as_col();
   x_scaled(find(x_scaled > 10)).fill(10);
 
-  mat U;
-  vec s;
-  mat V;
-  svd(U, s, V, x_scaled.t());
-  mat embedding = U.cols(0, dims-1) * diagmat(s.subvec(0, dims-1));
+  mat xT = x_scaled.t();
+    
+  Eigen::MatrixXd Xm = Eigen::Map<Eigen::MatrixXd>(xT.memptr(), xT.n_rows, xT.n_cols);
+    
+  RandomPCA rpca;
+  rpca.stand_method_x = 0;
+  rpca.divisor = 0;
+  rpca.verbose = FALSE;
+    
+  rpca.pca_fast(Xm, 0, dims, 1e2, 1e-4, 1, FALSE);
+    
+  Rcpp::NumericMatrix P(Rcpp::wrap(rpca.Px));
+  mat embedding = Rcpp::as<arma::mat>(P);
 
   return embedding;
 }
