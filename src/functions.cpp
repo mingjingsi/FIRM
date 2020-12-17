@@ -19,7 +19,9 @@ mat scale_PCA(mat x, const int dims){
   rpca.pca_fast(Xm, 0, dims, 1e2, 1e-4, 1, FALSE);
     
   mat embedding = arma::mat(rpca.Px.data(), rpca.Px.rows(), rpca.Px.cols(),
-                                  false, false);
+                            true, false);
+  //mat embedding = arma::mat(rpca.Px.data(), rpca.Px.rows(), rpca.Px.cols(),
+  //                                false, false);
   // Rcpp::NumericMatrix P(Rcpp::wrap(rpca.Px));
   // mat embedding = Rcpp::as<arma::mat>(P);
 
@@ -52,7 +54,9 @@ mat integrated_scale_PCA(mat x, const int dims){
   rpca.pca_fast(Xm, 0, dims, 1e2, 1e-4, 1, FALSE);
     
   mat embedding = arma::mat(rpca.Px.data(), rpca.Px.rows(), rpca.Px.cols(),
-                                  false, false);
+                            true, false);
+  //mat embedding = arma::mat(rpca.Px.data(), rpca.Px.rows(), rpca.Px.cols(),
+  //                                false, false);
   //Rcpp::NumericMatrix P(Rcpp::wrap(rpca.Px));
   //mat embedding = Rcpp::as<arma::mat>(P);
 
