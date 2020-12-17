@@ -292,8 +292,8 @@ void FIRM_res::fit_by_thread(int thread_id){
     }
     int current_idx_SS2 = idx/tenx_FindClusters.n_cols;
     int current_idx_tenx = idx%tenx_FindClusters.n_cols;
-    printf("thread_id = %d, idx = %d, SS2_idx = %d, tenx_idx = %d, SS2_idx_num = %d, tenx_idx_num = %d \n",
-           thread_id, idx, current_idx_SS2, current_idx_tenx, SS2_FindClusters.n_cols, tenx_FindClusters.n_cols);
+    printf("thread_id = %d, idx = %d (out of %d), idx1 = %d (out of %d), idx2 = %d (out of %d) \n",
+           thread_id, idx+1, SS2_FindClusters.n_cols*tenx_FindClusters.n_cols, current_idx_SS2+1, SS2_FindClusters.n_cols, current_idx_tenx+1, tenx_FindClusters.n_cols);
     loop_by_thread(idx, current_idx_SS2, current_idx_tenx);
   }
 }
