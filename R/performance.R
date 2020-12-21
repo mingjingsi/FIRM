@@ -54,6 +54,8 @@ label_trans <- function(integrated, ref = "10X", query = "SS2", k = 10){
   nn_table <- apply(nn_anno, 1, table)
 
   pred_anno_SS2 <- as.character(lapply(nn_table, function(x) names(x)[which.max(x)]))
+  
+  names(pred_anno_SS2) <- colnames(integrated)[which(integrated$dataset == query)]                                  
 
   return(pred_anno = pred_anno_SS2)
 }
