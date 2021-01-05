@@ -72,7 +72,7 @@ match_score <- function(integrated, ref = "10X", query = "SS2", k = 10){
                 integrated@reductions$pca@cell.embeddings[which(integrated$dataset == query), ],
                 k = k)
 
-  metric <- rowMeans(nn$nn.dists)/rowMeans(nn_SS2$nn.dists[, -1])
+  metric <- rowMeans(nn_SS2$nn.dists[, -1])/rowMeans(nn$nn.dists)
 
   names(metric) <- rownames(integrated@reductions$pca@cell.embeddings[which(integrated$dataset == query), ])
 
