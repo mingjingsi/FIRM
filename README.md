@@ -14,8 +14,7 @@ install_github("mingjingsi/FIRM")
 
 # Usage
 
-[The 'FIRM' vignette](https://github.com/mingjingsi/FIRM/blob/master/inst/doc/FIRM_package.pdf?raw=true) will provide a good start point for the analysis using FIRM package. Two demos are also provided ([Demo 1](https://htmlpreview.github.io/?https://github.com/mingjingsi/FIRM/blob/master/inst/doc/FIRM%20Demo1.html)).
-<a href="github.com/mingjingsi/FIRM/blob/master/inst/doc/FIRM%20Demo1.html" title="About Me">About Me</a>
+[The 'FIRM' vignette](https://github.com/mingjingsi/FIRM/blob/master/inst/doc/FIRM_package.pdf?raw=true) will provide a good start point for the analysis using FIRM package. Two demos are also provided ([Demo 1](https://drive.google.com/file/d/1nPE2Wjz7Y0BVSFFgIIFyx-u1tBoxzRJu/view?usp=sharing) and [Demo 2](https://drive.google.com/file/d/1tS6UIHB5jhYmOksmS62R29C2s5FgW-lM/view?usp=sharing)).
 
 
 # Reference
