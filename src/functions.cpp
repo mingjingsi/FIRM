@@ -178,23 +178,22 @@ void pair_info(uvec& SS2_paired_name, uvec& tenx_paired_name, uvec& num_SS2, uve
     //choose which one should be the smallest cluster after subsampling based on the No. of cells kept
     uword ind_SS2 = num_SS2_ini.index_min();
     uword ind_tenx = num_tenx_ini.index_min();
-    uvec num_tenx1_tmp = num_tenx_ini;
-    num_tenx1_tmp(ind_SS2) = num_tenx_ini(ind_tenx)*num_SS2_ini(ind_SS2)/num_SS2_ini(ind_tenx);
+    
     mat prop_join1 = zeros<mat>(num_SS2_ini.n_elem, 2);
     prop_join1.col(0) = conv_to<vec>::from(num_SS2_ini)/num_SS2_ini(ind_SS2);
-    prop_join1.col(1) = conv_to<vec>::from(num_tenx1_tmp)/num_tenx1_tmp(ind_SS2);
+    prop_join1.col(1) = conv_to<vec>::from(num_tenx_ini)/num_tenx_ini(ind_tenx)/num_SS2_ini(ind_SS2)*num_SS2_ini(ind_tenx);
+    prop_join1(ind_SS2, 1) = 1;
     vec prop_paired1 = min(prop_join1, 1).as_col();
-    uvec num_SS21 = conv_to<uvec>::from(round(prop_paired1*num_SS2_ini(ind_SS2)));
-    uvec num_tenx1 = conv_to<uvec>::from(round(prop_paired1*num_tenx1_tmp(ind_SS2)));
+    uvec num_SS21 = conv_to<uvec>::from(ceil(prop_paired1*num_SS2_ini(ind_SS2)));
+    uvec num_tenx1 = conv_to<uvec>::from(ceil(prop_paired1*num_tenx_ini(ind_tenx)*num_SS2_ini(ind_SS2)/num_SS2_ini(ind_tenx)));
 
-    uvec num_SS22_tmp = num_SS2_ini;
-    num_SS22_tmp(ind_tenx) = num_SS2_ini(ind_SS2)*num_tenx_ini(ind_tenx)/num_tenx_ini(ind_SS2);
     mat prop_join2 = zeros<mat>(num_tenx_ini.n_elem, 2);
-    prop_join2.col(0) = conv_to<vec>::from(num_SS22_tmp)/num_SS22_tmp(ind_tenx);
+    prop_join2.col(0) = conv_to<vec>::from(num_SS2_ini)/num_SS2_ini(ind_SS2)/num_tenx_ini(ind_tenx)*num_tenx_ini(ind_SS2);
+    prop_join2(ind_tenx, 0) = 1;
     prop_join2.col(1) = conv_to<vec>::from(num_tenx_ini)/num_tenx_ini(ind_tenx);
     vec prop_paired2 = min(prop_join2, 1).as_col();
-    uvec num_SS22 = conv_to<uvec>::from(round(prop_paired2*num_SS22_tmp(ind_tenx)));
-    uvec num_tenx2 = conv_to<uvec>::from(round(prop_paired2*num_tenx_ini(ind_tenx)));
+    uvec num_SS22 = conv_to<uvec>::from(ceil(prop_paired2*num_SS2_ini(ind_SS2)*num_tenx_ini(ind_tenx)/num_tenx_ini(ind_SS2)));
+    uvec num_tenx2 = conv_to<uvec>::from(ceil(prop_paired2*num_tenx_ini(ind_tenx)));
 
     if (sum(num_SS21 + num_tenx1) > sum(num_SS22 + num_tenx2)){
       if ((sum(num_SS21)/sum(num_SS2_ini) < 0.5) || (sum(num_tenx1)/sum(num_tenx_ini) < 0.25)){
