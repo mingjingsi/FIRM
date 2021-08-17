@@ -19,5 +19,5 @@ install_github("mingjingsi/FIRM")
 
 # Reference
 
-Jingsi Ming, Zhixiang Lin, Xiang Wan, Can Yang, Angela Ruohao Wu, FIRM: Fast Integration of single-cell RNA-sequencing data across Multiple platforms
-https://www.biorxiv.org/content/10.1101/2020.06.02.129031v1.full.pdf
+Jingsi Ming, Zhixiang Lin, Jia Zhao, Xiang Wan, Can Yang, Angela Ruohao Wu, FIRM: Flexible Integration of single-cell RNA-sequencing data for large-scale Multi-tissue cell atlas datasets
+https://www.biorxiv.org/content/10.1101/2020.06.02.129031v2
