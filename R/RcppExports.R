@@ -5,7 +5,7 @@ FIRM_res <- function(SS2, hvg_ind_SS2, SS2_FindClusters, tenx, hvg_ind_tenx, ten
     .Call('_FIRM_FIRM_res', PACKAGE = 'FIRM', SS2, hvg_ind_SS2, SS2_FindClusters, tenx, hvg_ind_tenx, tenx_FindClusters, dims, gene_all_num, gene_all_hvg_ind, gene_all_ind_SS2, gene_all_ind_tenx, quantile_default, rept_ds)
 }
 
-FIRM_res_all <- function(SS2, hvg_ind_SS2, SS2_FindClusters, tenx, hvg_ind_tenx, tenx_FindClusters, dims, gene_all_num, gene_all_hvg_ind, gene_all_ind_SS2, gene_all_ind_tenx, quantile_default, rept_ds = 50L, k = 5L, max_k = 300L, coreNum = 1L) {
-    .Call('_FIRM_FIRM_res_all', PACKAGE = 'FIRM', SS2, hvg_ind_SS2, SS2_FindClusters, tenx, hvg_ind_tenx, tenx_FindClusters, dims, gene_all_num, gene_all_hvg_ind, gene_all_ind_SS2, gene_all_ind_tenx, quantile_default, rept_ds, k, max_k, coreNum)
+FIRM_res_all <- function(SS2, SS2_FindClusters, tenx, tenx_FindClusters, dims, quantile_default, rept_ds = 50L, k = 5L, max_k = 300L, coreNum = 1L) {
+    .Call('_FIRM_FIRM_res_all', PACKAGE = 'FIRM', SS2, SS2_FindClusters, tenx, tenx_FindClusters, dims, quantile_default, rept_ds, k, max_k, coreNum)
 }
 
