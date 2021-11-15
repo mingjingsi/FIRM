@@ -4,7 +4,7 @@ Title:  FIRM
 Version: 0.1.0
 Author: Jingsi Ming
 Maintainer: Jingsi Ming <jsming@ust.hk>
-Description: This package provides functions for integration of single-cell RNA-sequencing data across multiple platforms.
+Description: This package provides functions flexible integration of heterogeneous scRNA-seq datasets across multiple tissue types, platforms and experimental batches.
 Encoding: UTF-8
 LazyData: true
 Imports: Rcpp (>= 1.0.4), RcppArmadillo, RANN, RcppEigen
