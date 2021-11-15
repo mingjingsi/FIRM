@@ -9,9 +9,6 @@ void FIRM_res::loop_by_thread(int idx, int res_SS2_ind, int res_tenx_ind){
   uword nSS2 = SS2.n_cols;    // No. of cells in SS2
   uword ntenx = tenx.n_cols;  // No. of cells in 10X
 
-  mat SS2_scale = SS2.rows(hvg_ind_SS2 - 1);
-  mat tenx_scale = tenx.rows(hvg_ind_tenx - 1);
-
   vec SS2_FindClusters_current = SS2_FindClusters.col(res_SS2_ind);
   vec tenx_FindClusters_current = tenx_FindClusters.col(res_tenx_ind);
 
@@ -30,7 +27,7 @@ void FIRM_res::loop_by_thread(int idx, int res_SS2_ind, int res_tenx_ind){
   // calculate the center of each cluster based on cell embeddings of PCA
   mat all_ini_SS2 = zeros<mat>(nSS2, dims);
   mat all_ini_tenx = zeros<mat>(ntenx, dims);
-  join_scale_PCA_sep(all_ini_SS2, all_ini_tenx, SS2_scale, tenx_scale, dims);
+  join_scale_PCA_sep(all_ini_SS2, all_ini_tenx, SS2, tenx, dims);
 
   mat SS2_center_ini = zeros<mat>(nSS2_cluster, dims);
   for (int i = 0; i < nSS2_cluster; i++){
@@ -130,27 +127,25 @@ void FIRM_res::loop_by_thread(int idx, int res_SS2_ind, int res_tenx_ind){
 
           if (num > 20){ // subsample when the No. of cells is not very small
             // calculate the standard deviation based on the cells after subsampling and scale the data
-            mat SS2_cluster_tmp = SS2_scale.cols(find(SS2_FindClusters_current == NNC_tenx(tenx_unpaired_ind(j), i)));
+            mat SS2_cluster_tmp = SS2.cols(find(SS2_FindClusters_current == NNC_tenx(tenx_unpaired_ind(j), i)));
             float rept_tmp =  std::round(SS2_cluster_tmp.n_cols/num) + 1;
             float rept_min = 50;
             double rept = std::min(rept_tmp, rept_min);
             vec sd_SS2_tmp = zeros<vec>(SS2_cluster_tmp.n_rows);
             for (int iter = 0; iter < rept; iter++){
               mat SS2_cluster_tmp_new = SS2_cluster_tmp.cols(randperm(SS2_cluster_tmp.n_cols, num));
-              mat SS2_all_tmp_new = join_rows(SS2_scale.cols(find(SS2_FindClusters_current != NNC_tenx(tenx_unpaired_ind(j), i))), SS2_cluster_tmp_new);
+              mat SS2_all_tmp_new = join_rows(SS2.cols(find(SS2_FindClusters_current != NNC_tenx(tenx_unpaired_ind(j), i))), SS2_cluster_tmp_new);
               sd_SS2_tmp += stddev(SS2_all_tmp_new, 0, 1);
             }
             vec sd_SS2_tmp_new = sd_SS2_tmp/rept;
 
-            int check = check_merge(SS2_scale, sd_SS2_tmp_new, tenx_scale, dims, SS2_FindClusters_current, tenx_FindClusters_current,
+            int check = check_merge(SS2, sd_SS2_tmp_new, tenx, dims, SS2_FindClusters_current, tenx_FindClusters_current,
                                     NNC_tenx(tenx_unpaired_ind(j), i), tenx_unpaired_ind(j), quantile_def);
 
             if (check >= 1){
               merge_pair(tenx_unpaired_ind(j)) = NNC_tenx(tenx_unpaired_ind(j), i);
+              break;
             }
-
-          } else {
-            break;
           }
         } else { //If the proportion in 10X is greater than that in SS2, subsample cells in the j-th cluster in 10X
           float num_tmp = sum(tenx_FindClusters_current != tenx_unpaired_ind(j))*prop_SS2/(1 - prop_SS2); //No. of cells in the j-th cluster in 10X after downsampling
@@ -160,28 +155,26 @@ void FIRM_res::loop_by_thread(int idx, int res_SS2_ind, int res_tenx_ind){
 
           if (num > 20){ // subsample when the No. of cells is not very small
             // calculate the standard deviation based on the cells after subsampling and scale the data
-            mat tenx_cluster_tmp = tenx_scale.cols(find(tenx_FindClusters_current == tenx_unpaired_ind(j)));
+            mat tenx_cluster_tmp = tenx.cols(find(tenx_FindClusters_current == tenx_unpaired_ind(j)));
             float rept_tmp =  std::round(tenx_cluster_tmp.n_cols/num) + 1;
             float rept_min = 50;
             double rept = std::min(rept_tmp, rept_min);
             vec sd_tenx_tmp = zeros<vec>(tenx_cluster_tmp.n_rows);
             for (int iter = 0; iter < rept; iter++){
               mat tenx_cluster_tmp_new = tenx_cluster_tmp.cols(randperm(tenx_cluster_tmp.n_cols, num));
-              mat tenx_all_tmp_new = join_rows(tenx_scale.cols(find(tenx_FindClusters_current != tenx_unpaired_ind(j))), tenx_cluster_tmp_new);
+              mat tenx_all_tmp_new = join_rows(tenx.cols(find(tenx_FindClusters_current != tenx_unpaired_ind(j))), tenx_cluster_tmp_new);
               sd_tenx_tmp += stddev(tenx_all_tmp_new, 0, 1);
             }
             vec sd_tenx_tmp_new = sd_tenx_tmp/rept;
 
-            int check = check_merge(SS2_scale, tenx_scale, sd_tenx_tmp_new, dims, SS2_FindClusters_current, tenx_FindClusters_current,
+            int check = check_merge(SS2, tenx, sd_tenx_tmp_new, dims, SS2_FindClusters_current, tenx_FindClusters_current,
                                     NNC_tenx(tenx_unpaired_ind(j), i), tenx_unpaired_ind(j), quantile_def);
 
             if (check >= 1){
               merge_pair(tenx_unpaired_ind(j)) = NNC_tenx(tenx_unpaired_ind(j), i);
+              break;
             }
-
-          } else {
-            break;
-          }
+          } 
         }
       }
     }
@@ -215,8 +208,7 @@ void FIRM_res::loop_by_thread(int idx, int res_SS2_ind, int res_tenx_ind){
       mat tenx_cluster_tmp = tenx.cols(find(tenx_FindClusters_current == tenx_paired_name_ini(0)));
       vec sd_tenx = stddev(tenx_cluster_tmp, 0, 1);
 
-      Embedding.slice(idx) = integrated_scale_fill_hvg_PCA(SS2, tenx, sd_SS2, sd_tenx, gene_all_num, nSS2, ntenx, gene_all_ind_SS2, gene_all_ind_tenx,
-                      gene_all_hvg_ind, dims);
+      Embedding.slice(idx) = integrated_scale_fill_hvg_PCA(SS2, tenx, sd_SS2, sd_tenx, dims);
 
 
     } else{
@@ -236,37 +228,47 @@ void FIRM_res::loop_by_thread(int idx, int res_SS2_ind, int res_tenx_ind){
       pair_info(SS2_paired_name, tenx_paired_name, num_SS2, num_tenx, num_SS2_ini, num_tenx_ini, SS2_paired_name_ini, tenx_paired_name_ini);
 
       uword n_paired_new = SS2_paired_name.n_elem;
-
-      ///// calculate standard deviation for scaling based on subsampling
-      // arma_rng::set_seed(0);
-      vec sd_SS2_sum = zeros<vec>(SS2.n_rows);
-      vec sd_tenx_sum = zeros<vec>(tenx.n_rows);
-      for (int iter = 0; iter < rept_ds; iter++){
-        mat SS2_matrix = zeros<mat>(SS2.n_rows, sum(num_SS2));
-        mat tenx_matrix = zeros<mat>(tenx.n_rows, sum(num_tenx));
-        uword ind_begin_SS2 = 0;
-        uword ind_begin_tenx = 0;
-        for (int i = 0; i < n_paired_new; i++){
-          mat SS2_cluster = SS2.cols(find(SS2_FindClusters_current == SS2_paired_name(i)));
-          mat tenx_cluster = tenx.cols(find(tenx_FindClusters_current == tenx_paired_name(i)));
-
-          SS2_matrix.cols(ind_begin_SS2, ind_begin_SS2+num_SS2(i)-1) = SS2_cluster.cols(randperm(SS2_cluster.n_cols, num_SS2(i)));
-          tenx_matrix.cols(ind_begin_tenx, ind_begin_tenx+num_tenx(i)-1) = tenx_cluster.cols(randperm(tenx_cluster.n_cols, num_tenx(i)));
-
-          ind_begin_SS2 += num_SS2(i);
-          ind_begin_tenx += num_tenx(i);
+      
+      if (n_paired_new == 1){
+        mat SS2_cluster_tmp = SS2.cols(find(SS2_FindClusters_current == SS2_paired_name_ini(0)));
+        vec sd_SS2 = stddev(SS2_cluster_tmp, 0, 1);
+        
+        mat tenx_cluster_tmp = tenx.cols(find(tenx_FindClusters_current == tenx_paired_name_ini(0)));
+        vec sd_tenx = stddev(tenx_cluster_tmp, 0, 1);
+        
+        Embedding.slice(idx) = integrated_scale_fill_hvg_PCA(SS2, tenx, sd_SS2, sd_tenx, dims);
+        
+        
+      } else{
+        ///// calculate standard deviation for scaling based on subsampling
+        // arma_rng::set_seed(0);
+        vec sd_SS2_sum = zeros<vec>(SS2.n_rows);
+        vec sd_tenx_sum = zeros<vec>(tenx.n_rows);
+        for (int iter = 0; iter < rept_ds; iter++){
+          mat SS2_matrix = zeros<mat>(SS2.n_rows, sum(num_SS2));
+          mat tenx_matrix = zeros<mat>(tenx.n_rows, sum(num_tenx));
+          uword ind_begin_SS2 = 0;
+          uword ind_begin_tenx = 0;
+          for (int i = 0; i < n_paired_new; i++){
+            mat SS2_cluster = SS2.cols(find(SS2_FindClusters_current == SS2_paired_name(i)));
+            mat tenx_cluster = tenx.cols(find(tenx_FindClusters_current == tenx_paired_name(i)));
+            
+            SS2_matrix.cols(ind_begin_SS2, ind_begin_SS2+num_SS2(i)-1) = SS2_cluster.cols(randperm(SS2_cluster.n_cols, num_SS2(i)));
+            tenx_matrix.cols(ind_begin_tenx, ind_begin_tenx+num_tenx(i)-1) = tenx_cluster.cols(randperm(tenx_cluster.n_cols, num_tenx(i)));
+            
+            ind_begin_SS2 += num_SS2(i);
+            ind_begin_tenx += num_tenx(i);
+          }
+          sd_SS2_sum += stddev(SS2_matrix, 0, 1);
+          sd_tenx_sum += stddev(tenx_matrix, 0, 1);
         }
-        sd_SS2_sum += stddev(SS2_matrix, 0, 1);
-        sd_tenx_sum += stddev(tenx_matrix, 0, 1);
+        
+        vec sd_SS2 = sd_SS2_sum/rept_ds;
+        vec sd_tenx = sd_tenx_sum/rept_ds;
+        
+        ///// do scaling and obtain new expression matrix
+        Embedding.slice(idx) = integrated_scale_fill_hvg_PCA(SS2, tenx, sd_SS2, sd_tenx, dims);
       }
-
-      vec sd_SS2 = sd_SS2_sum/rept_ds;
-      vec sd_tenx = sd_tenx_sum/rept_ds;
-
-      ///// do scaling and obtain new expression matrix
-      Embedding.slice(idx) = integrated_scale_fill_hvg_PCA(SS2, tenx, sd_SS2, sd_tenx, gene_all_num, nSS2, ntenx, gene_all_ind_SS2, gene_all_ind_tenx,
-                      gene_all_hvg_ind, dims);
-
     }
   }
 }

@@ -114,7 +114,7 @@ RcppExport SEXP FIRM_res(arma::mat& SS2, arma::uvec& hvg_ind_SS2, arma::vec& SS2
   uvec tenx_unpaired_ind = find(merge_pair == 999);
 
   // check the unpaired clusters by subsampling
-  if (tenx_unpaired_ind.n_elem != 0){ // if there is unpaired cluster for either SS2 or 10X
+  if (tenx_unpaired_ind.n_elem != 0){ // if there is unpaired cluster for 10X
     for (int j = 0; j < tenx_unpaired_ind.n_elem; j++){
       uvec prop_tenx_tmp = zeros<uvec>(1);
       prop_tenx_tmp(0) = sum(tenx_FindClusters == tenx_unpaired_ind(j));
@@ -151,12 +151,10 @@ RcppExport SEXP FIRM_res(arma::mat& SS2, arma::uvec& hvg_ind_SS2, arma::vec& SS2
 
             if (check >= 1){
               merge_pair(tenx_unpaired_ind(j)) = NNC_tenx(tenx_unpaired_ind(j), i);
+              break;
             }
 
-
-          } else {
-            break;
-          }
+          } 
         } else { //If the proportion in 10X is greater than that in SS2, subsample cells in the j-th cluster in 10X
           float num_tmp = sum(tenx_FindClusters != tenx_unpaired_ind(j))*prop_SS2/(1 - prop_SS2); //No. of cells in the j-th cluster in 10X after downsampling
           fvec num_float = zeros<fvec>(1);
@@ -182,11 +180,10 @@ RcppExport SEXP FIRM_res(arma::mat& SS2, arma::uvec& hvg_ind_SS2, arma::vec& SS2
 
             if (check >= 1){
               merge_pair(tenx_unpaired_ind(j)) = NNC_tenx(tenx_unpaired_ind(j), i);
+              break;
             }
 
-          } else {
-            break;
-          }
+          } 
         }
 
       }
@@ -250,42 +247,58 @@ RcppExport SEXP FIRM_res(arma::mat& SS2, arma::uvec& hvg_ind_SS2, arma::vec& SS2
       pair_info(SS2_paired_name, tenx_paired_name, num_SS2, num_tenx, num_SS2_ini, num_tenx_ini, SS2_paired_name_ini, tenx_paired_name_ini);
 
       uword n_paired_new = SS2_paired_name.n_elem;
-
-      ///// calculate standard deviation for scaling based on subsampling
-      // arma_rng::set_seed(0);
-      vec sd_SS2_sum = zeros<vec>(SS2.n_rows);
-      vec sd_tenx_sum = zeros<vec>(tenx.n_rows);
-      for (int iter = 0; iter < rept_ds; iter++){
-        mat SS2_matrix = zeros<mat>(SS2.n_rows, sum(num_SS2));
-        mat tenx_matrix = zeros<mat>(tenx.n_rows, sum(num_tenx));
-        uword ind_begin_SS2 = 0;
-        uword ind_begin_tenx = 0;
-        for (int i = 0; i < n_paired_new; i++){
-          mat SS2_cluster = SS2.cols(find(SS2_FindClusters == SS2_paired_name(i)));
-          mat tenx_cluster = tenx.cols(find(tenx_FindClusters == tenx_paired_name(i)));
-
-          SS2_matrix.cols(ind_begin_SS2, ind_begin_SS2+num_SS2(i)-1) = SS2_cluster.cols(randperm(SS2_cluster.n_cols, num_SS2(i)));
-          tenx_matrix.cols(ind_begin_tenx, ind_begin_tenx+num_tenx(i)-1) = tenx_cluster.cols(randperm(tenx_cluster.n_cols, num_tenx(i)));
-
-          ind_begin_SS2 += num_SS2(i);
-          ind_begin_tenx += num_tenx(i);
+      
+      if (n_paired_new == 1){
+        mat SS2_cluster_tmp = SS2.cols(find(SS2_FindClusters == SS2_paired_name(0)));
+        vec sd_SS2 = stddev(SS2_cluster_tmp, 0, 1);
+        
+        mat tenx_cluster_tmp = tenx.cols(find(tenx_FindClusters == tenx_paired_name(0)));
+        vec sd_tenx = stddev(tenx_cluster_tmp, 0, 1);
+        
+        mat integrated = integrated_scale_fill(SS2, tenx, sd_SS2, sd_tenx, gene_all_num, nSS2, ntenx, gene_all_ind_SS2, gene_all_ind_tenx);
+        
+        Rcpp::List ret;
+        
+        ret["integrated"] = integrated;
+        
+        return ret;
+        
+      } else{
+        ///// calculate standard deviation for scaling based on subsampling
+        // arma_rng::set_seed(0);
+        vec sd_SS2_sum = zeros<vec>(SS2.n_rows);
+        vec sd_tenx_sum = zeros<vec>(tenx.n_rows);
+        for (int iter = 0; iter < rept_ds; iter++){
+          mat SS2_matrix = zeros<mat>(SS2.n_rows, sum(num_SS2));
+          mat tenx_matrix = zeros<mat>(tenx.n_rows, sum(num_tenx));
+          uword ind_begin_SS2 = 0;
+          uword ind_begin_tenx = 0;
+          for (int i = 0; i < n_paired_new; i++){
+            mat SS2_cluster = SS2.cols(find(SS2_FindClusters == SS2_paired_name(i)));
+            mat tenx_cluster = tenx.cols(find(tenx_FindClusters == tenx_paired_name(i)));
+            
+            SS2_matrix.cols(ind_begin_SS2, ind_begin_SS2+num_SS2(i)-1) = SS2_cluster.cols(randperm(SS2_cluster.n_cols, num_SS2(i)));
+            tenx_matrix.cols(ind_begin_tenx, ind_begin_tenx+num_tenx(i)-1) = tenx_cluster.cols(randperm(tenx_cluster.n_cols, num_tenx(i)));
+            
+            ind_begin_SS2 += num_SS2(i);
+            ind_begin_tenx += num_tenx(i);
+          }
+          sd_SS2_sum += stddev(SS2_matrix, 0, 1);
+          sd_tenx_sum += stddev(tenx_matrix, 0, 1);
         }
-        sd_SS2_sum += stddev(SS2_matrix, 0, 1);
-        sd_tenx_sum += stddev(tenx_matrix, 0, 1);
+        
+        vec sd_SS2 = sd_SS2_sum/rept_ds;
+        vec sd_tenx = sd_tenx_sum/rept_ds;
+        
+        ///// do scaling and obtain new expression matrix
+        mat integrated = integrated_scale_fill(SS2, tenx, sd_SS2, sd_tenx, gene_all_num, nSS2, ntenx, gene_all_ind_SS2, gene_all_ind_tenx);
+        
+        Rcpp::List ret;
+        
+        ret["integrated"] = integrated;
+        
+        return ret;
       }
-
-      vec sd_SS2 = sd_SS2_sum/rept_ds;
-      vec sd_tenx = sd_tenx_sum/rept_ds;
-
-      ///// do scaling and obtain new expression matrix
-      mat integrated = integrated_scale_fill(SS2, tenx, sd_SS2, sd_tenx, gene_all_num, nSS2, ntenx, gene_all_ind_SS2, gene_all_ind_tenx);
-
-      Rcpp::List ret;
-
-      ret["integrated"] = integrated;
-
-      return ret;
-
     }
   }
 }
