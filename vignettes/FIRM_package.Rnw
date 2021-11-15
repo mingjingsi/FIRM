@@ -22,8 +22,7 @@ pdfauthor={Jingsi Ming},
 pdftitle={FIRM Vignette}]
 {hyperref}
 
-\title{`\texttt{FIRM}' Package to integrate single-cell RNA-sequencing data
-across Mmultiple platforms}
+\title{`\texttt{FIRM}' Package for flexible integration of heterogeneous scRNA-seq datasets across multiple tissue types, platforms and experimental batches}
 
 \date{\today}
 
@@ -36,9 +35,7 @@ across Mmultiple platforms}
 \section{Overview}
 
 This vignette provides an introduction to the `\texttt{FIRM}' package.
-R package `\texttt{FIRM}' implements FIRM, an algorithm for efficient and
-accurate integration of heterogeneous scRNA-seq datasets across multiple
-platforms.
+R package `\texttt{FIRM}' implements FIRM, an algorithm for flexible integration of heterogeneous scRNA-seq datasets across multiple tissue types, platforms and experimental batches.
 
 The FIRM package can be loaded with the command:
 
@@ -147,7 +144,7 @@ DimPlot(integrated, reduction = "umap", group.by = "annotation") +
 @
 
 \begin{thebibliography}{99}
-\bibitem{Ming} Jingsi Ming, Zhixiang Lin, Xiang Wan, Can Yang, Angela Ruohao Wu, FIRM: Fast Integration of single-cell RNA-sequencing data across Multiple platforms https://www.biorxiv.org/content/10.1101/2020.06.02.129031v1.full.pd.
+\bibitem{Ming} Jingsi Ming, Zhixiang Lin, Jia Zhao, Xiang Wan, Can Yang, Angela Ruohao Wu, FIRM: Flexible Integration of single-cell RNA-sequencing data for large-scale Multi-tissue cell atlas datasets. https://www.biorxiv.org/content/10.1101/2020.06.02.129031v2
 
 \bibitem{Schaum} Schaum, N. et al. Single-cell transcriptomics of 20 mouse organs creates a Tabula Muris. Nature 562, 367–372 (2018).
 
