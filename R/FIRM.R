@@ -1,8 +1,8 @@
 library(Seurat)
 library(RANN)
 
-FIRM <- function(SS2, tenx, hvg1, hvg2, dims, res_low_SS2 = 0.1, res_high_SS2 = 2,
-                 res_low_tenx = 0.1, res_high_tenx = 2,
+FIRM <- function(SS2, tenx, hvg1, hvg2, dims, all_genes = FALSE, res_seq_SS2 = seq(0.1, 2, 0.1),
+                 res_seq_tenx = seq(0.1, 2, 0.1),
                  quantile_default = 0.75, max.k = 300, rept = 50, coreNum = 1, verbose = FALSE){
 
   set.seed(0)
@@ -20,8 +20,8 @@ FIRM <- function(SS2, tenx, hvg1, hvg2, dims, res_low_SS2 = 0.1, res_high_SS2 = 
   rm(tenx_embedding)
   gc()
 
-  res_seq_SS2 <- seq(res_low_SS2, res_high_SS2, 0.1)
-  res_seq_tenx <- seq(res_low_tenx, res_high_tenx, 0.1)
+#   res_seq_SS2 <- seq(res_low_SS2, res_high_SS2, 0.1)
+#   res_seq_tenx <- seq(res_low_tenx, res_high_tenx, 0.1)
 
   res_SS2 <- NULL
   res_tenx <- NULL
@@ -46,15 +46,20 @@ FIRM <- function(SS2, tenx, hvg1, hvg2, dims, res_low_SS2 = 0.1, res_high_SS2 = 
     num_cluster_SS2_old <- num_cluster_SS2
   }
 
-  if (length(res_SS2) == 0){
-
+  if (all_genes == FALSE){
+    integrated_PCA <- cbind(SS2[hvg, ], tenx[hvg, ])
+  } else {
     integrated_PCA <- matrix(0, length(gene_all), ncol(SS2) + ncol(tenx))
     rownames(integrated_PCA) <- gene_all
     colnames(integrated_PCA) <- c(colnames(SS2), colnames(tenx))
     integrated_PCA[rownames(SS2), 1:ncol(SS2)] <- SS2
     integrated_PCA[rownames(tenx), (ncol(SS2)+1):(ncol(SS2)+ncol(tenx))] <- tenx
-    integrated_PCA <- ScaleData(integrated_PCA, do.center = FALSE, verbose = FALSE)
-
+  }
+  integrated_PCA <- ScaleData(integrated_PCA, do.center = FALSE, verbose = FALSE)
+  
+  dataset_list_PCA <- c(rep(1, ncol(SS2)), rep(2, ncol(tenx)))
+  
+  if (length(res_SS2) == 0){
     if (verbose == TRUE){
       return(list(integrated = integrated_PCA))
     }
@@ -96,77 +101,85 @@ FIRM <- function(SS2, tenx, hvg1, hvg2, dims, res_low_SS2 = 0.1, res_high_SS2 = 
   SS2_FindClusters <- matrix(as.numeric(as.matrix(SS2_FindClusters)), nrow(SS2_FindClusters), ncol(SS2_FindClusters))
   tenx_FindClusters <- matrix(as.numeric(as.matrix(tenx_FindClusters)), nrow(tenx_FindClusters), ncol(tenx_FindClusters))
 
-  gene_all_num <- length(gene_all)
-
-  tmp <- seq(1, gene_all_num, 1)
-  names(tmp) <- gene_all
-  gene_all_ind_SS2 <- as.numeric(tmp[rownames(SS2)[which(rownames(SS2) %in% gene_all)]])
-  tmp <- seq(1, nrow(SS2), 1)
-  names(tmp) <- rownames(SS2)
-  hvg_ind_SS2 <- as.numeric(tmp[hvg])
-
-  tmp <- seq(1, gene_all_num, 1)
-  names(tmp) <- gene_all
-  gene_all_ind_tenx <- as.numeric(tmp[rownames(tenx)[which(rownames(tenx) %in% gene_all)]])
-  tmp <- seq(1, nrow(tenx), 1)
-  names(tmp) <- rownames(tenx)
-  hvg_ind_tenx <- as.numeric(tmp[hvg])
-
-  gene_all_hvg <- which(gene_all %in% hvg)
-
-  if (ncol(SS2) < ncol(tenx)){
-    Dataset1 <- SS2
-    Dataset2 <- tenx
-    hvg_ind1 <- hvg_ind_SS2
-    FindClusters1 <- SS2_FindClusters
-    hvg_ind2 <- hvg_ind_tenx
-    FindClusters2 <- tenx_FindClusters
-    gene_all_ind1 <- gene_all_ind_SS2
-    gene_all_ind2 <- gene_all_ind_tenx
-    res1 <- res_SS2
-    res2 <- res_tenx
-
+  if (all_genes == FALSE){
+    if (ncol(SS2) < ncol(tenx)){
+      Dataset1 <- SS2[hvg, ]
+      Dataset2 <- tenx[hvg, ]
+      FindClusters1 <- SS2_FindClusters
+      FindClusters2 <- tenx_FindClusters
+      res1 <- res_SS2
+      res2 <- res_tenx
+    } else {
+      Dataset1 <- tenx[hvg, ]
+      Dataset2 <- SS2[hvg, ]
+      FindClusters1 <- tenx_FindClusters
+      FindClusters2 <- SS2_FindClusters
+      res1 <- res_tenx
+      res2 <- res_SS2
+    }
   } else {
-    Dataset1 <- tenx
-    Dataset2 <- SS2
-    hvg_ind1 <- hvg_ind_tenx
-    FindClusters1 <- tenx_FindClusters
-    hvg_ind2 <- hvg_ind_SS2
-    FindClusters2 <- SS2_FindClusters
-    gene_all_ind1 <- gene_all_ind_tenx
-    gene_all_ind2 <- gene_all_ind_SS2
-    res1 <- res_tenx
-    res2 <- res_SS2
+    gene_all_num <- length(gene_all)
+    
+    tmp <- seq(1, gene_all_num, 1)
+    names(tmp) <- gene_all
+    gene_all_ind_SS2 <- as.numeric(tmp[rownames(SS2)[which(rownames(SS2) %in% gene_all)]])
+    tmp <- seq(1, nrow(SS2), 1)
+    names(tmp) <- rownames(SS2)
+    hvg_ind_SS2 <- as.numeric(tmp[hvg])
+    
+    tmp <- seq(1, gene_all_num, 1)
+    names(tmp) <- gene_all
+    gene_all_ind_tenx <- as.numeric(tmp[rownames(tenx)[which(rownames(tenx) %in% gene_all)]])
+    tmp <- seq(1, nrow(tenx), 1)
+    names(tmp) <- rownames(tenx)
+    hvg_ind_tenx <- as.numeric(tmp[hvg])
+    
+    gene_all_hvg <- which(gene_all %in% hvg)
+    
+    if (ncol(SS2) < ncol(tenx)){
+      Dataset1 <- SS2
+      Dataset2 <- tenx
+      hvg_ind1 <- hvg_ind_SS2
+      FindClusters1 <- SS2_FindClusters
+      hvg_ind2 <- hvg_ind_tenx
+      FindClusters2 <- tenx_FindClusters
+      gene_all_ind1 <- gene_all_ind_SS2
+      gene_all_ind2 <- gene_all_ind_tenx
+      res1 <- res_SS2
+      res2 <- res_tenx
+    } else {
+      Dataset1 <- tenx
+      Dataset2 <- SS2
+      hvg_ind1 <- hvg_ind_tenx
+      FindClusters1 <- tenx_FindClusters
+      hvg_ind2 <- hvg_ind_SS2
+      FindClusters2 <- SS2_FindClusters
+      gene_all_ind1 <- gene_all_ind_tenx
+      gene_all_ind2 <- gene_all_ind_SS2
+      res1 <- res_tenx
+      res2 <- res_SS2
+    }
   }
-  
+
   dataset_list <- c(rep(1, ncol(Dataset1)), rep(2, ncol(Dataset2)))
-  dataset_list_PCA <- c(rep(1, ncol(SS2)), rep(2, ncol(tenx)))
   
   if ((length(res1)*length(res2)) == 1){
-    result <- FIRM_res(Dataset1, hvg_ind1, FindClusters1,
-                       Dataset2, hvg_ind2, FindClusters2,
-                       dims, gene_all_num, gene_all_hvg,
-                       gene_all_ind1, gene_all_ind2,
-                       quantile_default = quantile_default, rept = rept)
+    if (all_genes == FALSE){
+      result <- FIRM_res_hvg(Dataset1, FindClusters1, Dataset2, FindClusters2,
+                         dims, quantile_default = quantile_default, rept = rept)
+    } else {
+      result <- FIRM_res(Dataset1, hvg_ind1, FindClusters1,
+                         Dataset2, hvg_ind2, FindClusters2,
+                         dims, gene_all_num, gene_all_hvg,
+                         gene_all_ind1, gene_all_ind2,
+                         quantile_default = quantile_default, rept = rept)
+    }
 
-    integrated_PCA <- matrix(0, length(hvg), ncol(SS2) + ncol(tenx))
-    rownames(integrated_PCA) <- hvg
-    colnames(integrated_PCA) <- c(colnames(SS2), colnames(tenx))
-    integrated_PCA[hvg, 1:ncol(SS2)] <- SS2[hvg, ]
-    integrated_PCA[hvg, (ncol(SS2)+1):(ncol(SS2)+ncol(tenx))] <- tenx[hvg, ]
-    integrated_PCA <- ScaleData(integrated_PCA, do.center = FALSE, verbose = FALSE)
     integrated_PCA_embedding <- RunPCA(integrated_PCA, features = hvg, npcs = dims, verbose = FALSE)
     Metric_PCA <- mean(Mixing_Metric(integrated_PCA_embedding@cell.embeddings, dataset_list_PCA, max.k = max.k))
     
     if (all(result$integrated == 0)){
       # print("PCA")
-      integrated_PCA <- matrix(0, length(gene_all), ncol(SS2) + ncol(tenx))
-      rownames(integrated_PCA) <- gene_all
-      colnames(integrated_PCA) <- c(colnames(SS2), colnames(tenx))
-      integrated_PCA[rownames(SS2), 1:ncol(SS2)] <- SS2
-      integrated_PCA[rownames(tenx), (ncol(SS2)+1):(ncol(SS2)+ncol(tenx))] <- tenx
-      integrated_PCA <- ScaleData(integrated_PCA, do.center = FALSE, verbose = FALSE)
-      
       if (verbose == TRUE){
         return(list(integrated = integrated_PCA, Metric_PCA = Metric_PCA))
       }
@@ -176,7 +189,11 @@ FIRM <- function(SS2, tenx, hvg1, hvg2, dims, res_low_SS2 = 0.1, res_high_SS2 = 
     }
 
     integrated_FIRM <- result$integrated
-    rownames(integrated_FIRM) <- gene_all
+    if (all_genes == FALSE){
+      rownames(integrated_FIRM) <- hvg
+    } else {
+      rownames(integrated_FIRM) <- gene_all
+    }
     colnames(integrated_FIRM) <- c(colnames(Dataset1), colnames(Dataset2))
     integrated_FIRM <- ScaleData(integrated_FIRM, do.center = FALSE, verbose = FALSE)
     integrated_FIRM_embedding <- RunPCA(integrated_FIRM[hvg, ], features = hvg, npcs = dims, verbose = FALSE)
@@ -186,13 +203,6 @@ FIRM <- function(SS2, tenx, hvg1, hvg2, dims, res_low_SS2 = 0.1, res_high_SS2 = 
 
     if(min(Metric_FIRM) >= Metric_PCA){
       # print("PCA")
-      integrated_PCA <- matrix(0, length(gene_all), ncol(SS2) + ncol(tenx))
-      rownames(integrated_PCA) <- gene_all
-      colnames(integrated_PCA) <- c(colnames(SS2), colnames(tenx))
-      integrated_PCA[rownames(SS2), 1:ncol(SS2)] <- SS2
-      integrated_PCA[rownames(tenx), (ncol(SS2)+1):(ncol(SS2)+ncol(tenx))] <- tenx
-      integrated_PCA <- ScaleData(integrated_PCA, do.center = FALSE, verbose = FALSE)
-      
       if (verbose == TRUE){
         return(list(integrated = integrated_PCA, Metric_PCA = Metric_PCA, Metric_FIRM = Metric_FIRM))
       }
@@ -232,13 +242,6 @@ FIRM <- function(SS2, tenx, hvg1, hvg2, dims, res_low_SS2 = 0.1, res_high_SS2 = 
 
   if(min(Metric_FIRM) >= Metric_PCA){
     # print("PCA")
-    integrated_PCA <- matrix(0, length(gene_all), ncol(SS2) + ncol(tenx))
-    rownames(integrated_PCA) <- gene_all
-    colnames(integrated_PCA) <- c(colnames(SS2), colnames(tenx))
-    integrated_PCA[rownames(SS2), 1:ncol(SS2)] <- SS2
-    integrated_PCA[rownames(tenx), (ncol(SS2)+1):(ncol(SS2)+ncol(tenx))] <- tenx
-    integrated_PCA <- ScaleData(integrated_PCA, do.center = FALSE, verbose = FALSE)
-
     if (verbose == TRUE){
       return(list(integrated = integrated_PCA, Metric_PCA = Metric_PCA, Metric_FIRM = Metric_FIRM))
     }
@@ -252,21 +255,19 @@ FIRM <- function(SS2, tenx, hvg1, hvg2, dims, res_low_SS2 = 0.1, res_high_SS2 = 
     }
     j <- ceiling(which.min(Metric_FIRM)/length(res1))
 
-    result <- FIRM_res(Dataset1, hvg_ind1, FindClusters1[, i],
-                       Dataset2, hvg_ind2, FindClusters2[, j],
-                       dims, gene_all_num, gene_all_hvg,
-                       gene_all_ind1, gene_all_ind2,
-                       quantile_default = quantile_default, rept = rept)
+    if (all_genes == FALSE){
+      result <- FIRM_res_hvg(Dataset1, FindClusters1[, i], Dataset2, FindClusters2[, j],
+                         dims, quantile_default = quantile_default, rept = rept)
+    } else {
+      result <- FIRM_res(Dataset1, hvg_ind1, FindClusters1[, i],
+                         Dataset2, hvg_ind2, FindClusters2[, j],
+                         dims, gene_all_num, gene_all_hvg,
+                         gene_all_ind1, gene_all_ind2,
+                         quantile_default = quantile_default, rept = rept)
+    }
 
     if (all(result$integrated == 0)){
       # print("PCA")
-      integrated_PCA <- matrix(0, length(gene_all), ncol(SS2) + ncol(tenx))
-      rownames(integrated_PCA) <- gene_all
-      colnames(integrated_PCA) <- c(colnames(SS2), colnames(tenx))
-      integrated_PCA[rownames(SS2), 1:ncol(SS2)] <- SS2
-      integrated_PCA[rownames(tenx), (ncol(SS2)+1):(ncol(SS2)+ncol(tenx))] <- tenx
-      integrated_PCA <- ScaleData(integrated_PCA, do.center = FALSE, verbose = FALSE)
-
       if (verbose == TRUE){
         return(list(integrated = integrated_PCA, Metric_PCA = Metric_PCA, Metric_FIRM = Metric_FIRM))
       }
@@ -276,7 +277,11 @@ FIRM <- function(SS2, tenx, hvg1, hvg2, dims, res_low_SS2 = 0.1, res_high_SS2 = 
     }
 
     integrated_FIRM <- result$integrated
-    rownames(integrated_FIRM) <- gene_all
+    if (all_genes == FALSE) {
+      rownames(integrated_FIRM) <- hvg
+    } else {
+      rownames(integrated_FIRM) <- gene_all
+    }
     colnames(integrated_FIRM) <- c(colnames(Dataset1), colnames(Dataset2))
     integrated_FIRM <- ScaleData(integrated_FIRM, do.center = FALSE, verbose = FALSE)
 

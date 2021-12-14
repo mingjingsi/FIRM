@@ -9,3 +9,7 @@ FIRM_res_all <- function(SS2, SS2_FindClusters, tenx, tenx_FindClusters, dims, q
     .Call('_FIRM_FIRM_res_all', PACKAGE = 'FIRM', SS2, SS2_FindClusters, tenx, tenx_FindClusters, dims, quantile_default, rept_ds, k, max_k, coreNum)
 }
 
+FIRM_res_hvg <- function(SS2, SS2_FindClusters, tenx, tenx_FindClusters, dims, quantile_default, rept_ds = 50L) {
+    .Call('_FIRM_FIRM_res_hvg', PACKAGE = 'FIRM', SS2, SS2_FindClusters, tenx, tenx_FindClusters, dims, quantile_default, rept_ds)
+}
+
