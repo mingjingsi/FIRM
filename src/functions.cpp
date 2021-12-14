@@ -126,6 +126,15 @@ mat integrated_fill_hvg_PCA(mat SS2, mat tenx, int dims){
   return integrated_embedding;
 }
 
+mat integrated_scale_fill_hvg(mat SS2, mat tenx, vec sd_SS2, vec sd_tenx, int dims){
+  
+  mat integrated_SS2 = SS2.each_col()/(sd_SS2 + (sd_SS2 == 0));
+  mat integrated_tenx = tenx.each_col()/(sd_tenx + (sd_tenx == 0));
+  mat integrated = join_rows(integrated_SS2, integrated_tenx);
+  
+  return integrated;
+}
+
 mat integrated_scale_fill_hvg_PCA(mat SS2, mat tenx, vec sd_SS2, vec sd_tenx, int dims){
 
   mat integrated_SS2 = SS2.each_col()/(sd_SS2 + (sd_SS2 == 0));

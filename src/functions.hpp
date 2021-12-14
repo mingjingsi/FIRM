@@ -16,6 +16,8 @@ mat integrated_fill(mat SS2, mat tenx, uword gene_all_num, uword nSS2, uword nte
 mat integrated_scale_fill(mat SS2, mat tenx, vec sd_SS2, vec sd_tenx, uword gene_all_num, uword nSS2, uword ntenx,
                           uvec gene_all_ind_SS2, uvec gene_all_ind_tenx);
 
+mat integrated_scale_fill_hvg(mat SS2, mat tenx, vec sd_SS2, vec sd_tenx, int dims);
+
 mat integrated_fill_hvg_PCA(mat SS2, mat tenx, int dims);
 
 mat integrated_scale_fill_hvg_PCA(mat SS2, mat tenx, vec sd_SS2, vec sd_tenx, int dims);
