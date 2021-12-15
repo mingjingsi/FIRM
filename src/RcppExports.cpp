@@ -50,10 +50,28 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// FIRM_res_hvg
+RcppExport SEXP FIRM_res_hvg(arma::mat& SS2, arma::vec& SS2_FindClusters, arma::mat& tenx, arma::vec& tenx_FindClusters, const int dims, double quantile_default, const int rept_ds);
+RcppExport SEXP _FIRM_FIRM_res_hvg(SEXP SS2SEXP, SEXP SS2_FindClustersSEXP, SEXP tenxSEXP, SEXP tenx_FindClustersSEXP, SEXP dimsSEXP, SEXP quantile_defaultSEXP, SEXP rept_dsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat& >::type SS2(SS2SEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type SS2_FindClusters(SS2_FindClustersSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type tenx(tenxSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type tenx_FindClusters(tenx_FindClustersSEXP);
+    Rcpp::traits::input_parameter< const int >::type dims(dimsSEXP);
+    Rcpp::traits::input_parameter< double >::type quantile_default(quantile_defaultSEXP);
+    Rcpp::traits::input_parameter< const int >::type rept_ds(rept_dsSEXP);
+    rcpp_result_gen = Rcpp::wrap(FIRM_res_hvg(SS2, SS2_FindClusters, tenx, tenx_FindClusters, dims, quantile_default, rept_ds));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_FIRM_FIRM_res", (DL_FUNC) &_FIRM_FIRM_res, 13},
     {"_FIRM_FIRM_res_all", (DL_FUNC) &_FIRM_FIRM_res_all, 10},
+    {"_FIRM_FIRM_res_hvg", (DL_FUNC) &_FIRM_FIRM_res_hvg, 7},
     {NULL, NULL, 0}
 };
 
