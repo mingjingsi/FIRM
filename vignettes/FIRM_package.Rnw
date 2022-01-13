@@ -100,9 +100,10 @@ dim(Dataset)
 We can use the integrated data for downstream analysis, such as PCA and visaulization. For example, we can create a Seurat object.
 <<create_seurat, warning=FALSE, message=FALSE>>=
 # counts
-integrated_counts <- matrix(0, nrow(Dataset), ncol(Dataset))
-rownames(integrated_counts) <- rownames(Dataset)
-colnames(integrated_counts) <- colnames(Dataset)
+gene_all <- union(rownames(SS2), rownames(tenx))
+integrated_counts <- matrix(0, length(gene_all), ncol(SS2) + ncol(tenx))
+rownames(integrated_counts) <- gene_all
+colnames(integrated_counts) <- c(colnames(SS2), colnames(tenx))
 integrated_counts[rownames(SS2), colnames(SS2)] <- as.matrix(SS2)
 integrated_counts[rownames(tenx), colnames(tenx)] <- as.matrix(tenx)
 
@@ -126,11 +127,11 @@ integrated <- AddMetaData(integrated,
 hvg <- intersect(hvg1, hvg2)
 
 # PCA
-integrated <- RunPCA(integrated, features = hvg, npcs = dims)
+integrated <- RunPCA(integrated, features = hvg, npcs = dims, verbose = FALSE)
 
 # UMAP
 integrated <- RunUMAP(integrated, reduction = "pca", dims = 1:dims,
-                      umap.method = 'umap-learn', metric = "correlation")
+                      umap.method = 'umap-learn', metric = "correlation", verbose = FALSE)
 @
 
 <<fig=TRUE>>=
