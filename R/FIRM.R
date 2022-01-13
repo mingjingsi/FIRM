@@ -3,8 +3,8 @@ library(RANN)
 
 FIRM <- function(SS2, tenx, hvg1, hvg2, dims, all_genes = FALSE, res_seq_SS2 = seq(0.1, 2, 0.1),
                  res_seq_tenx = seq(0.1, 2, 0.1),
-                 quantile_default = 0.75, max.k = 300, rept = 50, coreNum = 1, verbose = FALSE){
-
+                 coreNum = 1, verbose = FALSE){
+  
   set.seed(0)
   hvg <- intersect(hvg1, hvg2)
   gene_all <- union(rownames(SS2), rownames(tenx))
@@ -162,6 +162,9 @@ FIRM <- function(SS2, tenx, hvg1, hvg2, dims, all_genes = FALSE, res_seq_SS2 = s
   }
 
   dataset_list <- c(rep(1, ncol(Dataset1)), rep(2, ncol(Dataset2)))
+  quantile_default <- 0.75
+  max.k <- 300
+  rept <- 50
   
   if ((length(res1)*length(res2)) == 1){
     if (all_genes == FALSE){
