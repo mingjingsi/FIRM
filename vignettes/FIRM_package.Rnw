@@ -22,7 +22,7 @@ pdfauthor={Jingsi Ming},
 pdftitle={FIRM Vignette}]
 {hyperref}
 
-\title{`\texttt{FIRM}' Package for flexible integration of heterogeneous scRNA-seq datasets across multiple tissue types, platforms and experimental batches}
+\title{`\texttt{FIRM}' Package for flexible integration of scRNA-seq data}
 
 \date{\today}
 
@@ -89,7 +89,20 @@ The integrated data is provided in `\texttt{Dataset}'.
 <<FIRM, warning=FALSE, result=hide, message=FALSE>>=
 dims <- 15
 coreNum <- 4
-Dataset <- FIRM(Dataset1, Dataset2, hvg1, hvg2, dims = dims, coreNum = coreNum)
+Dataset <- FIRM(Dataset1, Dataset2, all_genes = FALSE, 
+                hvg1, hvg2, dims = dims, coreNum = coreNum)
+@
+
+<<FIRM, warning=FALSE, result=hide>>=
+dim(Dataset)
+@
+
+For downstream analysis which focuses on the highly variable genes shared by the datasets, such as dimension reduction, clustering and visualization, we set `\texttt{all\_genes = FALSE}' to improve the computational efficiency and memory usage, which is the default setting in `\texttt{FIRM}' function.
+For downstream analysis which requires full gene expression profiles, we set `\texttt{all\_genes = TRUE}' to obtain the harmonized data for all genes.
+
+<<FIRM, warning=FALSE, result=hide, message=FALSE>>=
+Dataset <- FIRM(Dataset1, Dataset2, all_genes = TRUE, 
+                hvg1, hvg2, dims = dims, coreNum = coreNum)
 @
 
 <<FIRM, warning=FALSE, result=hide>>=
@@ -100,10 +113,9 @@ dim(Dataset)
 We can use the integrated data for downstream analysis, such as PCA and visaulization. For example, we can create a Seurat object.
 <<create_seurat, warning=FALSE, message=FALSE>>=
 # counts
-gene_all <- union(rownames(SS2), rownames(tenx))
-integrated_counts <- matrix(0, length(gene_all), ncol(SS2) + ncol(tenx))
-rownames(integrated_counts) <- gene_all
-colnames(integrated_counts) <- c(colnames(SS2), colnames(tenx))
+integrated_counts <- matrix(0, nrow(Dataset), ncol(Dataset))
+rownames(integrated_counts) <- rownames(Dataset)
+colnames(integrated_counts) <- colnames(Dataset)
 integrated_counts[rownames(SS2), colnames(SS2)] <- as.matrix(SS2)
 integrated_counts[rownames(tenx), colnames(tenx)] <- as.matrix(tenx)
 
@@ -127,11 +139,11 @@ integrated <- AddMetaData(integrated,
 hvg <- intersect(hvg1, hvg2)
 
 # PCA
-integrated <- RunPCA(integrated, features = hvg, npcs = dims, verbose = FALSE)
+integrated <- RunPCA(integrated, features = hvg, npcs = dims)
 
 # UMAP
 integrated <- RunUMAP(integrated, reduction = "pca", dims = 1:dims,
-                      umap.method = 'umap-learn', metric = "correlation", verbose = FALSE)
+                      umap.method = 'umap-learn', metric = "correlation")
 @
 
 <<fig=TRUE>>=
@@ -145,7 +157,7 @@ DimPlot(integrated, reduction = "umap", group.by = "annotation") +
 @
 
 \begin{thebibliography}{99}
-\bibitem{Ming} Jingsi Ming, Zhixiang Lin, Jia Zhao, Xiang Wan, Can Yang, Angela Ruohao Wu, FIRM: Flexible Integration of single-cell RNA-sequencing data for large-scale Multi-tissue cell atlas datasets. https://www.biorxiv.org/content/10.1101/2020.06.02.129031v2
+\bibitem{Ming} Jingsi Ming, Zhixiang Lin, Jia Zhao, Xiang Wan, The Tabula Microcebus Consortium, Can Yang, Angela Ruohao Wu, FIRM: Flexible Integration of single-cell RNA-sequencing data for large-scale Multi-tissue cell atlas datasets. Briefings in Bioinformatics (2022). https://academic.oup.com/bib/advance-article/doi/10.1093/bib/bbac167/6585621
 
 \bibitem{Schaum} Schaum, N. et al. Single-cell transcriptomics of 20 mouse organs creates a Tabula Muris. Nature 562, 367–372 (2018).
 
