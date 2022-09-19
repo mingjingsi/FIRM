@@ -19,5 +19,5 @@ install_github("mingjingsi/FIRM")
 
 # Reference
 
-Jingsi Ming, Zhixiang Lin, Jia Zhao, Xiang Wan, Can Yang, Angela Ruohao Wu, FIRM: Flexible Integration of single-cell RNA-sequencing data for large-scale Multi-tissue cell atlas datasets
-https://www.biorxiv.org/content/10.1101/2020.06.02.129031v2
+Jingsi Ming, Zhixiang Lin, Jia Zhao, Xiang Wan, The Tabula Microcebus Consortium, Can Yang, Angela Ruohao Wu, FIRM: Flexible Integration of single-cell RNA-sequencing data for large-scale Multi-tissue cell atlas datasets. Briefings in Bioinformatics.
+https://academic.oup.com/bib/advance-article/doi/10.1093/bib/bbac167/6585621
