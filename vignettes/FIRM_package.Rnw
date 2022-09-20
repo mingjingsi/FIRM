@@ -110,7 +110,7 @@ dim(Dataset)
 @
 
 \subsection{Downstream analysis}
-We can use the integrated data for downstream analysis, such as PCA and visaulization. For example, we can create a Seurat object.
+We can use the integrated data for downstream analysis, such as PCA and visualization. For example, we can create a Seurat object.
 <<create_seurat, warning=FALSE, message=FALSE>>=
 # counts
 integrated_counts <- matrix(0, nrow(Dataset), ncol(Dataset))
@@ -154,6 +154,23 @@ DimPlot(integrated, reduction = "umap", group.by = "dataset")
 library(ggplot2)
 DimPlot(integrated, reduction = "umap", group.by = "annotation") +
   theme(legend.position = "top")
+@
+
+Example codes for clustering
+<<clustering, warning=FALSE, message=FALSE>>=
+integrated <- FindNeighbors(integrated)
+integrated <- FindClusters(integrated, resolution = 0.2, verbose = FALSE)
+@
+
+<<fig=TRUE>>=
+DimPlot(integrated, reduction = "umap", group.by = "seurat_clusters")
+@
+
+Example codes for differential gene expression analysis
+<<clustering, warning=FALSE, message=FALSE>>=
+markers <- FindMarkers(integrated, ident.1 = "0", ident.2 = "1", 
+                       group.by = "seurat_clusters", slot = "scale.data")
+head(markers)
 @
 
 \begin{thebibliography}{99}
